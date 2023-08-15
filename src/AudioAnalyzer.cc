@@ -513,10 +513,12 @@ void AudioAnalyzer::plotSignalMagnitude(
   j = 0;
 
   // We're fitting an 8192-point FFT to a 1024 pixel display width.
-  for (i = 0; i < bufferLength; i += 8)
+  for (i = 0; i < bufferLength; i += 4)
   {
     points[j].x = (short)j;
-    points[j].y = windowHeightInPixels - magnitudeBuffer[i] / 256;
+    points[j].y = windowHeightInPixels -
+                  (windowHeightInPixels / 2) -
+                  magnitudeBuffer[i] / 256;
 
     // Reference the next storage location.
     j++;
@@ -677,7 +679,7 @@ uint32_t AudioAnalyzer::computeSignalMagnitude(
   for (i = 0; i < bufferLength; i++)
   {
     // Grab these values for the magnitude;
-    magnitude = fabs(signalBufferPtr[i]);
+    magnitude = signalBufferPtr[i];
 
     // Save for display.
     magnitudeBuffer[i] = (int16_t)magnitude;
