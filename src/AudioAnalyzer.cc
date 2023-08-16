@@ -479,46 +479,41 @@ void AudioAnalyzer::drawGridlines(void)
 
 /*****************************************************************************
 
-  Name: plotSignalMagnitude
+  Name: plotSignalAmplitude
 
-  Purpose: The purpose of this function is to perform a magnitude plot
-  of IQ data to the display.
+  Purpose: The purpose of this function is to perform an amplitude plot
+  of PCM data.
 
-  Calling Sequence: plotSignalMagnitude(signalBufferPtr,bufferLength)
+  Calling Sequence: plotSignalAmplitude(signalBufferPtr,bufferLength)
 
   Inputs:
 
-    signalBufferPtr - A pointer to a buffer of IQ data.  The buffer is
-    formatted with interleaved data as: I1,Q1,I2,Q2,...
+    signalBufferPtr - A pointer to a buffer of PCM data.
 
-    bufferLength - The number of values in the signal buffer.  This
-    represents the total number of items in the buffer, rather than
-    the number of IQ sample pairs in the buffer.
+    bufferLength - The number of values in the signal buffer.
 
  Outputs:
 
     None.
 
 *****************************************************************************/
-void AudioAnalyzer::plotSignalMagnitude(
+void AudioAnalyzer::plotSignalAmplitude(
   int16_t *signalBufferPtr,
   uint32_t bufferLength)
 {
   uint32_t i;
   uint32_t j;
 
-  bufferLength = computeSignalMagnitude(signalBufferPtr,bufferLength);
+  bufferLength = computeSignalAmplitude(signalBufferPtr,bufferLength);
 
   // Reference the starts of the points array.
   j = 0;
 
-  // We're fitting an 8192-point FFT to a 1024 pixel display width.
-  for (i = 0; i < bufferLength; i += 4)
+  // We're fitting 8192 PCM samples to a 1024 pixel display width.
+  for (i = 0; i < bufferLength; i += 8)
   {
     points[j].x = (short)j;
-    points[j].y = windowHeightInPixels -
-                  (windowHeightInPixels / 2) -
-                  magnitudeBuffer[i] / 256;
+    points[j].y = (windowHeightInPixels / 2) - (magnitudeBuffer[i] / 256);
 
     // Reference the next storage location.
     j++;
@@ -559,7 +554,7 @@ void AudioAnalyzer::plotSignalMagnitude(
 
   return;
 
-} // plotSignalMagnitude
+} // plotSignalAmplitude
 
 /*****************************************************************************
 
@@ -596,7 +591,10 @@ void AudioAnalyzer::plotPowerSpectrum(
   // Reference the starts of the points array.
   j = 0;
 
-  // We're fitting an 8192-point FFT to a 1024 pixel display width.
+  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+  // We're fitting the first half of a 8192-point FFT to a
+  // 1024 pixel display width.
+  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   for (i = 0; i < bufferLength; i += 4)
   {
     points[j].x = (short)j;
@@ -645,30 +643,27 @@ void AudioAnalyzer::plotPowerSpectrum(
 
 /*****************************************************************************
 
-  Name: computeSignalMagnitude
+  Name: computeSignalAmplitude
 
-  Purpose: The purpose of this function is to compute the magnitude of
-  IQ data.
+  Purpose: The purpose of this function is to compute the amplitude of
+  a signal.
 
-  Calling Sequence: numberOfSamples = computeSignalMagnitude(
+  Calling Sequence: numberOfSamples = computeSignalAmplitude(
                                          signalBufferPtr,
                                          bufferLength)
 
   Inputs:
 
-    signalBufferPtr - A pointer to a buffer of IQ data.  The buffer is
-    formatted with interleaved data as: I1,Q1,I2,Q2,...
+    signalBufferPtr - A pointer to a buffer of PCM data.
 
-    bufferLength - The number of values in the signal buffer.  This
-    represents the total number of items in the buffer, rather than
-    the number of IQ sample pairs in the buffer.
+    bufferLength - The number of values in the signal buffer.
 
  Outputs:
 
     None.
 
 *****************************************************************************/
-uint32_t AudioAnalyzer::computeSignalMagnitude(
+uint32_t AudioAnalyzer::computeSignalAmplitude(
   int16_t *signalBufferPtr,
   uint32_t bufferLength)
 {
@@ -689,7 +684,7 @@ uint32_t AudioAnalyzer::computeSignalMagnitude(
 
   return (bufferLength);
 
-} // computeSignalMagnitude
+} // computeSignalAmplitude
 
 /*****************************************************************************
 
@@ -706,8 +701,7 @@ uint32_t AudioAnalyzer::computeSignalMagnitude(
     formatted with interleaved data as: I1,Q1,I2,Q2,...
 
     bufferLength - The number of values in the signal buffer.  This
-    represents the total number of items in the buffer, rather than
-    the number of IQ sample pairs in the buffer.
+    represents the total number of items in the buffer.
 
  Outputs:
 
@@ -767,7 +761,7 @@ uint32_t AudioAnalyzer::computePowerSpectrum(
   } // for
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
-  return (bufferLength);
+  return (bufferLength/2);
 
 } // computePowerSpectrum
 

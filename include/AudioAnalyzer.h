@@ -33,7 +33,7 @@ class AudioAnalyzer
   AudioAnalyzer(DisplayType displayType,float sampleRate);
  ~AudioAnalyzer(void);
 
-  void plotSignalMagnitude(int16_t *signalBufferPtr,uint32_t bufferLength);
+  void plotSignalAmplitude(int16_t *signalBufferPtr,uint32_t bufferLength);
   void plotPowerSpectrum(int16_t *signalBufferPtr,uint32_t bufferLength);
 
   private:
@@ -47,7 +47,7 @@ class AudioAnalyzer
   uint16_t convertRgbTo16Bit(uint8_t red,uint8_t green,uint8_t blue);
   void drawGridlines(void);
 
-  uint32_t computeSignalMagnitude(int16_t *signalBufferPtr,
+  uint32_t computeSignalAmplitude(int16_t *signalBufferPtr,
                                   uint32_t bufferLength);
 
   uint32_t computePowerSpectrum(int16_t *signalBufferPtr,

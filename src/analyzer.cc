@@ -194,7 +194,7 @@ int main(int argc,char **argv)
       {
         case SignalMagnitude:
         {
-          analyzerPtr->plotSignalMagnitude(inputBuffer,count);
+          analyzerPtr->plotSignalAmplitude(inputBuffer,count);
           break;
         } // case
 
