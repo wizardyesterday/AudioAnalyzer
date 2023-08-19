@@ -65,6 +65,9 @@ class AudioAnalyzer
   char sweepTimeDivBuffer[80];
   char frequencySpanBuffer[80];
   char frequencySpanDivBuffer[80];
+
+  uint32_t spectrumStride;
+  uint32_t signalStride;
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
   // We ulitmately map values to these pixels.

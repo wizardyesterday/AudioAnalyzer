@@ -82,6 +82,10 @@ AudioAnalyzer::AudioAnalyzer(DisplayType displayType,float sampleRate)
   windowWidthInPixels = 1024;
   windowHeightInPixels = 256;
 
+  // Set strides.
+  spectrumStride = (N/2) / windowWidthInPixels;
+  signalStride = N / windowWidthInPixels;
+
   // Construct the Hanning window array.
   for (i = 0; i < N; i++)
   {
@@ -544,8 +548,8 @@ void AudioAnalyzer::plotSignalAmplitude(
   // Reference the starts of the points array.
   j = 0;
 
-  // We're fitting 8192 PCM samples to a 1024 pixel display width.
-  for (i = 0; i < bufferLength; i += 8)
+  // We're fitting 8192 PCM samples to the display width.
+  for (i = 0; i < bufferLength; i += signalStride)
   {
     points[j].x = (short)j;
     points[j].y = (windowHeightInPixels / 2) - (signalBufferPtr[i] / 256);
@@ -627,10 +631,10 @@ void AudioAnalyzer::plotPowerSpectrum(
   j = 0;
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  // We're fitting the first half of a 8192-point FFT to a
-  // 1024 pixel display width.
+  // We're fitting the first half of a 8192-point FFT to 
+  // the display width.
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  for (i = 0; i < bufferLength; i += 4)
+  for (i = 0; i < bufferLength; i += spectrumStride)
   {
     points[j].x = (short)j;
     points[j].y = windowHeightInPixels - magnitudeBuffer[i];
