@@ -541,8 +541,6 @@ void AudioAnalyzer::plotSignalAmplitude(
   uint32_t i;
   uint32_t j;
 
-  bufferLength = computeSignalAmplitude(signalBufferPtr,bufferLength);
-
   // Reference the starts of the points array.
   j = 0;
 
@@ -550,7 +548,7 @@ void AudioAnalyzer::plotSignalAmplitude(
   for (i = 0; i < bufferLength; i += 8)
   {
     points[j].x = (short)j;
-    points[j].y = (windowHeightInPixels / 2) - (magnitudeBuffer[i] / 256);
+    points[j].y = (windowHeightInPixels / 2) - (signalBufferPtr[i] / 256);
 
     // Reference the next storage location.
     j++;
@@ -571,11 +569,11 @@ void AudioAnalyzer::plotSignalAmplitude(
   // later.
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   XDrawString(displayPtr,window,graphicsContext,
-              768,20,
+              windowWidthInPixels-180,20,
               sweepTimeBuffer,strlen(sweepTimeBuffer));
 
   XDrawString(displayPtr,window,graphicsContext,
-              768,35,
+              windowWidthInPixels-180,35,
               sweepTimeDivBuffer,strlen(sweepTimeDivBuffer));
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
@@ -656,11 +654,11 @@ void AudioAnalyzer::plotPowerSpectrum(
   // later.
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   XDrawString(displayPtr,window,graphicsContext,
-              768,20,
+              windowWidthInPixels-180,20,
               frequencySpanBuffer,strlen(frequencySpanBuffer));
 
   XDrawString(displayPtr,window,graphicsContext,
-              768,35,
+              windowWidthInPixels-180,35,
               frequencySpanDivBuffer,strlen(frequencySpanDivBuffer));
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
@@ -677,51 +675,6 @@ void AudioAnalyzer::plotPowerSpectrum(
   return;
 
 } // plotPowerSpectrum
-
-/*****************************************************************************
-
-  Name: computeSignalAmplitude
-
-  Purpose: The purpose of this function is to compute the amplitude of
-  a signal.
-
-  Calling Sequence: numberOfSamples = computeSignalAmplitude(
-                                         signalBufferPtr,
-                                         bufferLength)
-
-  Inputs:
-
-    signalBufferPtr - A pointer to a buffer of PCM data.
-
-    bufferLength - The number of values in the signal buffer.
-
- Outputs:
-
-    None.
-
-*****************************************************************************/
-uint32_t AudioAnalyzer::computeSignalAmplitude(
-  int16_t *signalBufferPtr,
-  uint32_t bufferLength)
-{
-  uint32_t i;
-  float magnitude;
-  int16_t iMagnitude, qMagnitude;
-
-  for (i = 0; i < bufferLength; i++)
-  {
-    // Grab these values for the magnitude;
-    magnitude = signalBufferPtr[i];
-
-    // Save for display.
-    magnitudeBuffer[i] = (int16_t)magnitude;
-  } // for
-
-  // Swap the array halfs.
-
-  return (bufferLength);
-
-} // computeSignalAmplitude
 
 /*****************************************************************************
 
