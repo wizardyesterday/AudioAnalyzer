@@ -318,6 +318,9 @@ void AudioAnalyzer::initializeAnnotationParameters(float sampleRate)
   float sweepTimeInMs;
   float frequencySpanInHz;
 
+  // I like this in one place.
+  annotationHorizontalPosition = windowWidthInPixels - 180;
+
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Set up annotations.
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -545,7 +548,7 @@ void AudioAnalyzer::plotSignalAmplitude(
   uint32_t i;
   uint32_t j;
 
-  // Reference the starts of the points array.
+  // Reference the start of the points array.
   j = 0;
 
   // We're fitting 8192 PCM samples to the display width.
@@ -573,11 +576,11 @@ void AudioAnalyzer::plotSignalAmplitude(
   // later.
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   XDrawString(displayPtr,window,graphicsContext,
-              windowWidthInPixels-180,20,
+              annotationHorizontalPosition,20,
               sweepTimeBuffer,strlen(sweepTimeBuffer));
 
   XDrawString(displayPtr,window,graphicsContext,
-              windowWidthInPixels-180,35,
+              annotationHorizontalPosition,35,
               sweepTimeDivBuffer,strlen(sweepTimeDivBuffer));
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
@@ -627,7 +630,7 @@ void AudioAnalyzer::plotPowerSpectrum(
 
   bufferLength = computePowerSpectrum(signalBufferPtr,bufferLength);
 
-  // Reference the starts of the points array.
+  // Reference the start of the points array.
   j = 0;
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -658,11 +661,11 @@ void AudioAnalyzer::plotPowerSpectrum(
   // later.
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   XDrawString(displayPtr,window,graphicsContext,
-              windowWidthInPixels-180,20,
+              annotationHorizontalPosition,20,
               frequencySpanBuffer,strlen(frequencySpanBuffer));
 
   XDrawString(displayPtr,window,graphicsContext,
-              windowWidthInPixels-180,35,
+              annotationHorizontalPosition,35,
               frequencySpanDivBuffer,strlen(frequencySpanDivBuffer));
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
