@@ -413,9 +413,20 @@ uint16_t AudioAnalyzer::convertRgbTo16Bit(
 void AudioAnalyzer::drawGridlines(void)
 {
   uint32_t i;
+  int deltaH;
+  int deltaV;
+  int horizontalPosition;
+  int verticalPosition;
+
+  // Compute grid spacing.
+  deltaH = windowWidthInPixels / 16;
+  deltaV = windowHeightInPixels / 4;
 
   // Set the grid color.
   XSetForeground(displayPtr,graphicsContext,scopeGridColor);
+
+  // Compute horizontal position of first vertical grid.
+  horizontalPosition = deltaH;
 
   // Draw vertical lines.
   for (i = 1; i < 16; i++)
@@ -423,9 +434,17 @@ void AudioAnalyzer::drawGridlines(void)
     XDrawLine(displayPtr,
               window,
               graphicsContext,
-              i*64,0,i*64,
+              horizontalPosition,
+              0,
+              horizontalPosition,
               windowHeightInPixels);
+
+    // Compute next horizontal position of vertical grid.
+    horizontalPosition += deltaH;
   } // for
+
+  // Compute vertical position of first horizontal grid.
+  verticalPosition = deltaV;
 
   // Draw horozontal lines.
   for (i = 1; i < 4; i++)
@@ -433,7 +452,13 @@ void AudioAnalyzer::drawGridlines(void)
     XDrawLine(displayPtr,
               window,
               graphicsContext,
-              i,i*64,windowWidthInPixels,i*64);
+              0,
+              verticalPosition,
+              windowWidthInPixels,
+              verticalPosition);
+
+    // Compute next horizontal position of vertical grid.
+    verticalPosition += deltaV;
   } // for
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -447,12 +472,18 @@ void AudioAnalyzer::drawGridlines(void)
   XDrawLine(displayPtr,
             window,
             graphicsContext,
-            8*64-1,0,8*64-1,5);
+            (windowWidthInPixels/2) - 1,
+            0,
+            (windowWidthInPixels/2) - 1,
+            5);
 
   XDrawLine(displayPtr,
             window,
             graphicsContext,
-            8*64+1,0,8*64+1,5);
+            (windowWidthInPixels/2) + 1,
+            0,
+            (windowWidthInPixels/2) + 1,
+            5);
 
   //---------------------------------
   // Place marks on lower part of
@@ -461,12 +492,18 @@ void AudioAnalyzer::drawGridlines(void)
   XDrawLine(displayPtr,
             window,
             graphicsContext,
-            8*64-1,windowHeightInPixels-5,8*64-1,windowHeightInPixels);
+            (windowWidthInPixels/2) - 1,
+            windowHeightInPixels-5,
+            (windowWidthInPixels/2) - 1,
+            windowHeightInPixels);
 
   XDrawLine(displayPtr,
             window,
             graphicsContext,
-            8*64+1,windowHeightInPixels-5,8*64+1,windowHeightInPixels);
+            (windowWidthInPixels/2) + 1,
+            windowHeightInPixels-5,
+            (windowWidthInPixels/2) + 1,
+            windowHeightInPixels);
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
