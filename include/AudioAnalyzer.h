@@ -67,6 +67,8 @@ class AudioAnalyzer
   char frequencySpanDivBuffer[80];
 
   int annotationHorizontalPosition;
+  int annotationFirstLinePosition;
+  int annotationSecondLinePosition;
 
   uint32_t spectrumStride;
   uint32_t signalStride;
