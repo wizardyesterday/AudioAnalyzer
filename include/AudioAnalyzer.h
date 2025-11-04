@@ -30,7 +30,7 @@ class AudioAnalyzer
 
   public:
 
-  AudioAnalyzer(DisplayType displayType,float sampleRate);
+  AudioAnalyzer(DisplayType displayType,float sampleRate,int32_t baselineInDb);
  ~AudioAnalyzer(void);
 
   void plotSignalAmplitude(int16_t *signalBufferPtr,uint32_t bufferLength);
@@ -72,6 +72,7 @@ class AudioAnalyzer
 
   uint32_t spectrumStride;
   uint32_t signalStride;
+  int32_t baselineInDb;
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
   // We ulitmately map values to these pixels.

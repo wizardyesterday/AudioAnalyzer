@@ -4,14 +4,13 @@
 
 //*************************************************************************
 // This program provides the ability to display either the magnitude of
-// IQ (In-phase or Quadrature) signals that are provided by stdin.  The
-// data is 8-bit signed 2's complement, and is formatted as
-// I1,Q1; I2,Q2; ...
-// This program can also pass raw IQ data to stdout if required.
+// audio signals that are provided by stdin.  The
+// data is 16-bit signed 2's complement
 //
 // To run this program type,
 // 
-//     ./analyzer > -d <displaytype> -r <sampleRate> -D
+//    ./analyzer -d <displaytype> -r <sampleRate> -R <referenceLevel
+//               -D < inputFile
 //
 // where,
 //
@@ -19,12 +18,15 @@
 //    1 - Magnitude display.
 //    2 - Power spectrum display.
 //
-//    The D flag indicates that raw IQ data should be dumped to stdout.
+//    The D flag indicates that raw data should be dumped to stdout.
 //    This allows the data to be piped to another program.  Here's how
 //    to do this (for example, using a spectral display):
-//    ./analyzer -d 2 > >(other program to accept IQ data).
+//    ./analyzer -d 2 > >(other program to accept data).
 //
-//    sampleRate - The sample rate of the IQ data in S/s.
+//    sampleRate - The sample rate of the data in S/s.
+//
+//    referenceLevel - The reference level of the spectrum display in dB.
+//
 ///*************************************************************************
 #include <stdio.h>
 #include <stdint.h>
@@ -40,7 +42,8 @@ struct MyParameters
 {
   int *displayTypePtr;
   float *sampleRatePtr;
-  bool *iqDumpPtr;
+  int32_t *spectrumReferenceLevelPtr;
+  bool *dataDumpPtr;
 };
 
 /*****************************************************************************
@@ -82,8 +85,11 @@ bool getUserArguments(int argc,char **argv,struct MyParameters parameters)
   // Default to 8000S/s.
   *parameters.sampleRatePtr = 8000;
 
-  // Default to not dumping IQ data.
-  *parameters.iqDumpPtr = false;
+  // Default to 0dB reference level.
+  *parameters.spectrumReferenceLevelPtr = 0;
+
+  // Default to not dumping raw data.
+  *parameters.dataDumpPtr = false;
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
   // Set up for loop entry.
@@ -95,7 +101,7 @@ bool getUserArguments(int argc,char **argv,struct MyParameters parameters)
   while (!done)
   {
     // Retrieve the next option.
-    opt = getopt(argc,argv,"d:-r:-Dh");
+    opt = getopt(argc,argv,"d:r:R:Dh");
 
     switch (opt)
     {
@@ -111,17 +117,24 @@ bool getUserArguments(int argc,char **argv,struct MyParameters parameters)
         break;
       } // case
 
+      case 'R':
+      {
+        *parameters.spectrumReferenceLevelPtr = atol(optarg);
+        break;
+      } // case
+
       case 'D':
       {
-        *parameters.iqDumpPtr = true;
+        *parameters.dataDumpPtr = true;
         break;
       } // case
 
       case 'h':
       {
-        // Display usage.
-        fprintf(stderr,"./analyzer -d [1 - magnitude | 2 - spectrum]\n"
-                "-r samplerate (S/s)\n -D (dump PCM)\n");
+        fprintf(stderr,"./analyzer -d [1 - magnitude | 2 - spectrum\n"
+                "           -r samplerate (S/s) \n"
+                "           -R spectrumreferencelevel (dB)\n"
+                "           -D (dump raw data) < inputFile\n");
 
         // Indicate that program must be exited.
         exitProgram = true;
@@ -155,13 +168,15 @@ int main(int argc,char **argv)
   AudioAnalyzer *analyzerPtr;
   int displayType;
   float sampleRate;
-  bool iqDump;
+  int32_t spectrumReferenceLevel;
+  bool dataDump;
   struct MyParameters parameters;
 
   // Set up for parameter transmission.
   parameters.displayTypePtr = &displayType;
   parameters.sampleRatePtr = &sampleRate;
-  parameters.iqDumpPtr = &iqDump;
+  parameters.spectrumReferenceLevelPtr = &spectrumReferenceLevel;
+  parameters.dataDumpPtr = &dataDump;
 
   // Retrieve the system parameters.
   exitProgram = getUserArguments(argc,argv,parameters);
@@ -173,8 +188,9 @@ int main(int argc,char **argv)
   } // if
 
   // Instantiate signal analyzer.
-  analyzerPtr = new AudioAnalyzer((DisplayType)displayType,sampleRate);
-
+  analyzerPtr = new AudioAnalyzer((DisplayType)displayType,
+                                  sampleRate,
+                                  spectrumReferenceLevel);
   // Set up for loop entry.
   done = false;
 
@@ -206,9 +222,9 @@ int main(int argc,char **argv)
 
       } // switch
 
-      if (iqDump == true)
+      if (dataDump == true)
       {
-        // Write to stdout so that raw IQ can be piped to another program.
+        // Write to stdout so that raw can be piped to another program.
         fwrite(inputBuffer,sizeof(int16_t),N,stdout);
       } // if
     } // else

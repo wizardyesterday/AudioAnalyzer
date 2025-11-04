@@ -54,20 +54,30 @@ static int XErrorCallback(Display *displayPtr,XErrorEvent *errorPtr)
   Purpose: The purpose of this function is to serve as the constructor for
   an instance of an AudioAnalyzer.
 
-  Calling Sequence: AudioAnalyzer(sampleRate)
+  Calling Sequence: AudioAnalyzer(displayTypesampleRate,baselineInDb))
  
   Inputs:
 
-    sampleRate - The sample rate of incoming PCM data in units of S/s.
+    displayType - The type of analyzer display.
+
+    sampleRate - The sample rate of incoming IQ data in units of S/s.
+    
+    baselineInDb - The spectrum analyzer reference level in decibels.
 
  Outputs:
 
     None.
 
 *****************************************************************************/
-AudioAnalyzer::AudioAnalyzer(DisplayType displayType,float sampleRate)
+AudioAnalyzer::AudioAnalyzer(
+  DisplayType displayType,
+  float sampleRate,
+  int32_t baselineInDb)
 {
   uint32_t i;
+
+  // Spectrum display baseline.
+  this->baselineInDb = baselineInDb;
 
   if (sampleRate <= 0)
   {
@@ -790,8 +800,17 @@ uint32_t AudioAnalyzer::computePowerSpectrum(
     // Compute signal power, |I + jQ|.
     power = iK * iK;
 
+    // Scale for a normalized output.
+    power /= N;
+
     // We want power in decibels.
     powerInDb = 10*log10(power);
+
+    // Set the baseline to the reference level..
+    powerInDb += baselineInDb;
+
+    // Scale to display 20dB per division.
+    powerInDb *= 3.2;
 
     // We're reusing the magnitude buffer for power values.
     magnitudeBuffer[i] = (int16_t)powerInDb; 
