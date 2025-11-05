@@ -9,8 +9,9 @@
 //
 // To run this program type,
 // 
-//    ./analyzer -d <displaytype> -r <sampleRate> -R <referenceLevel
-//               -D < inputFile
+//    ./analyzer -d <displaytype> -r <sampleRate> -V <verticalgain
+//               -R <referenceLevel -D < inputFile
+//
 //
 // where,
 //
@@ -18,22 +19,31 @@
 //    1 - Magnitude display.
 //    2 - Power spectrum display.
 //
-//    The D flag indicates that raw data should be dumped to stdout.
+//    he R flag sets the reference level on the spectrum analyzer display.
+//
+//    The V flag sets the vertical gain of the signal yo be displayed on
+//    the spectrum analyzer display.
+//
+//    The U flag indicates that the IQ samples are unsigned 8-bit
+//    quantities rather than the default signed values.  This allows
+//    this program to work with the standard rtl-sdr tools such as
+//    rtl_sdr.
+//
+//    The D flag indicates that raw IQ data should be dumped to stdout.
 //    This allows the data to be piped to another program.  Here's how
 //    to do this (for example, using a spectral display):
-//    ./analyzer -d 2 > >(other program to accept data).
+//    ./analyzer -d 2 > >(other program to accept raw data).
 //
-//    sampleRate - The sample rate of the data in S/s.
+//    sampleRate - The sample rate of the IQ data in S/s.
 //
 //    referenceLevel - The reference level of the spectrum display in dB.
 //
-///*************************************************************************
+////*************************************************************************
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <math.h>
-
-#include <unistd.h>   // So we got the profile for 10 seconds
+#include <unistd.h>
 
 #include "AudioAnalyzer.h"
 
@@ -42,6 +52,7 @@ struct MyParameters
 {
   int *displayTypePtr;
   float *sampleRatePtr;
+  float *verticalGainPtr;
   int32_t *spectrumReferenceLevelPtr;
   bool *dataDumpPtr;
 };
@@ -83,7 +94,10 @@ bool getUserArguments(int argc,char **argv,struct MyParameters parameters)
   *parameters.displayTypePtr = SignalMagnitude;
 
   // Default to 8000S/s.
-  *parameters.sampleRatePtr = 8000;
+  *parameters.sampleRatePtr = 8000U;
+
+  // Default to no amplification.
+  *parameters.verticalGainPtr = 1;
 
   // Default to 0dB reference level.
   *parameters.spectrumReferenceLevelPtr = 0;
@@ -101,7 +115,7 @@ bool getUserArguments(int argc,char **argv,struct MyParameters parameters)
   while (!done)
   {
     // Retrieve the next option.
-    opt = getopt(argc,argv,"d:r:R:Dh");
+    opt = getopt(argc,argv,"d:r:V:R:Dh");
 
     switch (opt)
     {
@@ -114,6 +128,12 @@ bool getUserArguments(int argc,char **argv,struct MyParameters parameters)
       case 'r':
       {
         *parameters.sampleRatePtr = atof(optarg);
+        break;
+      } // case
+
+      case 'V':
+      {
+        *parameters.verticalGainPtr = atof(optarg);
         break;
       } // case
 
@@ -134,6 +154,7 @@ bool getUserArguments(int argc,char **argv,struct MyParameters parameters)
         fprintf(stderr,"./analyzer -d [1 - magnitude | 2 - spectrum\n"
                 "           -r samplerate (S/s) \n"
                 "           -R spectrumreferencelevel (dB)\n"
+                "           -V Vertical gain of signal to display\n"
                 "           -D (dump raw data) < inputFile\n");
 
         // Indicate that program must be exited.
@@ -168,6 +189,7 @@ int main(int argc,char **argv)
   AudioAnalyzer *analyzerPtr;
   int displayType;
   float sampleRate;
+  float verticalGain;
   int32_t spectrumReferenceLevel;
   bool dataDump;
   struct MyParameters parameters;
@@ -175,6 +197,7 @@ int main(int argc,char **argv)
   // Set up for parameter transmission.
   parameters.displayTypePtr = &displayType;
   parameters.sampleRatePtr = &sampleRate;
+  parameters.verticalGainPtr = &verticalGain;
   parameters.spectrumReferenceLevelPtr = &spectrumReferenceLevel;
   parameters.dataDumpPtr = &dataDump;
 
@@ -190,6 +213,7 @@ int main(int argc,char **argv)
   // Instantiate signal analyzer.
   analyzerPtr = new AudioAnalyzer((DisplayType)displayType,
                                   sampleRate,
+                                  verticalGain,
                                   spectrumReferenceLevel);
   // Set up for loop entry.
   done = false;
