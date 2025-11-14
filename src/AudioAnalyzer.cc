@@ -689,7 +689,7 @@ void AudioAnalyzer::plotPowerSpectrum(
   uint32_t i;
   uint32_t j;
 
-  bufferLength = computePowerSpectrum(signalBufferPtr,bufferLength);
+  bufferLength = computeLogPowerSpectrum(signalBufferPtr,bufferLength);
 
   // Reference the start of the points array.
   j = 0;
@@ -748,12 +748,12 @@ void AudioAnalyzer::plotPowerSpectrum(
 
 /*****************************************************************************
 
-  Name: computePowerSpectrum
+  Name: computeLogPowerSpectrum
 
   Purpose: The purpose of this function is to compute the power spectrum
   of IQ data.
 
-  Calling Sequence: computePowerSpectrum(signalBufferPtr,bufferLength)
+  Calling Sequence: computeLogPowerSpectrum(signalBufferPtr,bufferLength)
 
   Inputs:
 
@@ -768,7 +768,7 @@ void AudioAnalyzer::plotPowerSpectrum(
     None.
 
 *****************************************************************************/
-uint32_t AudioAnalyzer::computePowerSpectrum(
+uint32_t AudioAnalyzer::computeLogPowerSpectrum(
   int16_t *signalBufferPtr,
   uint32_t bufferLength)
 {
@@ -835,6 +835,6 @@ uint32_t AudioAnalyzer::computePowerSpectrum(
 
   return (bufferLength/2);
 
-} // computePowerSpectrum
+} // computeLogPowerSpectrum
 
 

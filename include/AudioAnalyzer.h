@@ -51,8 +51,8 @@ class AudioAnalyzer
   uint16_t convertRgbTo16Bit(uint8_t red,uint8_t green,uint8_t blue);
   void drawGridlines(void);
 
-  uint32_t computePowerSpectrum(int16_t *signalBufferPtr,
-                                uint32_t bufferLength);
+  uint32_t computeLogPowerSpectrum(int16_t *signalBufferPtr,
+                                   uint32_t bufferLength);
 
   //*******************************************************************
   // Attributes.
